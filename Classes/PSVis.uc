@@ -2,24 +2,25 @@ class PSVis extends Mutator;
 
 #exec TEXTURE IMPORT NAME=greyskin FILE="Textures\greyskin.bmp" MIPS=OFF
 
-var Actor DummyList[64];
+var PSVisDummy DummyList[64];
 
 event PostBeginPlay() {
     local PlayerStart PS;
-    local Actor D;
+    local PSVisDummy D;
     local int i;
 
     super.PostBeginPlay();
 
     i = 0;
     foreach AllActors(class'PlayerStart', PS) {
-        D = Spawn(class'Actor', none, '', PS.Location, PS.Rotation);
+        D = Spawn(class'PSVisDummy', none, '', PS.Location, PS.Rotation);
         D.SetCollision(false, false, false);
         D.SetCollisionSize(0,0);
         D.DrawType = DT_Mesh;
         D.Mesh = LodMesh'Botpack.Commando';
         D.Skin = texture'PSVis.greyskin';
         D.LoopAnim('Breath1');
+        D.bAlwaysRelevant = true;
 
         DummyList[i] = D;
         i++;
@@ -31,22 +32,16 @@ event PostBeginPlay() {
 
 event Timer() {
     local int i;
-    local PlayerPawn P;
-    local bool bAllReady;
+    local DeathMatchPlus G;
 
-    bAllReady = true;
-    foreach AllActors(class'PlayerPawn', P) {
-        if (P.bReadyToPlay == false) {
-            bAllReady = false;
-            break;
-        }
-    }
+    G = DeathMatchPlus(Level.Game);
 
-    if (bAllReady) {
+    if ((G != none) && G.bNetReady == false && (G.bRequireReady == false || (G.CountDown <= 0))) {
         for (i = 0; i < 64; i++) {
             if (DummyList[i] == none)
                 break;
 
+            DummyList[i].DrawType = DT_None;
             DummyList[i].Destroy();
             DummyList[i] = none;
         }

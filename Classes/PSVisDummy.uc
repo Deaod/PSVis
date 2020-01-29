@@ -1,0 +1,1 @@
+class PSVisDummy extends Actor;
