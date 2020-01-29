@@ -1,0 +1,2 @@
+[Public]
+Object=(Name=PSVis.PSVis,Class=Class,MetaClass=Engine.Mutator,Description="PlayerStart Visualizer,Shows up to 64 PlayerStarts.")
